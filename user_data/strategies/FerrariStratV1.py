@@ -36,21 +36,17 @@ class FerrariStratV1(IStrategy):
     # Hyperoptable parameters
     # Buy Supertrend Multipliers
     buy_m1 = IntParameter(1, 3, default=3)
-    buy_m2 = IntParameter(4, 6, default=8)
-    buy_m3 = IntParameter(7, 10, default=12)
+    buy_m2 = IntParameter(4, 6, default=5)
+    buy_m3 = IntParameter(7, 10, default=10)
     # Buy Supertrend Periods
-    buy_p1 = IntParameter(10, 30, default=14)
-    buy_p2 = IntParameter(31, 50, default=20)
-    buy_p3 = IntParameter(51, 100, default=50)
+    buy_p1 = IntParameter(10, 20, default=14)
+    buy_p2 = IntParameter(21, 50, default=25)
+    buy_p3 = IntParameter(51, 100, default=60)
 
-    # Sell Supertrend Multipliers
-    # sell_m1 = IntParameter(1, 3, default=3)
-    # sell_m2 = IntParameter(4, 6, default=8)
-    # sell_m3 = IntParameter(7, 10, default=12)
-    # Sell Supertrend Periods
-    # sell_p1 = IntParameter(10, 30, default=14)
-    # sell_p2 = IntParameter(31, 50, default=20)
-    # sell_p3 = IntParameter(51, 100, default=50)
+    # MACD Parameters
+    buy_macd_fast = IntParameter(4, 40, default=32)  # Schnelle Periode
+    buy_macd_slow = IntParameter(10, 250, default=200)  # Langsame Periode
+    buy_macd_sign = IntParameter(3, 20, default=9)  # Signal Smoothing (Signal)
 
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 30
@@ -88,30 +84,16 @@ class FerrariStratV1(IStrategy):
             multiplier=self.buy_m3.value,
         )["SUPERTd_" + str(self.buy_p3.value) + "_" + str(self.buy_m3.value) + ".0"]
 
-        # dataframe[f"supertrend_1_sell"] = pta.supertrend(
-        #     dataframe["high"],
-        #     dataframe["low"],
-        #     dataframe["close"],
-        #     length=self.sell_p1.value,
-        #     multiplier=self.sell_m1.value,
-        # )["SUPERTd_" + str(self.sell_p1.value) + "_" + str(self.sell_m1.value) + ".0"]
-
-        # dataframe[f"supertrend_2_sell"] = pta.supertrend(
-        #     dataframe["high"],
-        #     dataframe["low"],
-        #     dataframe["close"],
-        #     length=self.sell_p2.value,
-        #     multiplier=self.sell_m2.value,
-        # )["SUPERTd_" + str(self.sell_p2.value) + "_" + str(self.sell_m2.value) + ".0"]
-
-        # dataframe[f"supertrend_3_sell"] = pta.supertrend(
-        #     dataframe["high"],
-        #     dataframe["low"],
-        #     dataframe["close"],
-        #     length=self.sell_p3.value,
-        #     multiplier=self.sell_m3.value,
-        # )["SUPERTd_" + str(self.sell_p3.value) + "_" + str(self.sell_m3.value) + ".0"]
-
+        macd = pta.macd(
+            dataframe["close"],
+            self.buy_macd_fast.value,
+            self.buy_macd_slow.value,
+            self.buy_macd_sign.value,
+        )
+        macd_suffix = f"_{self.buy_macd_fast.value}_{self.buy_macd_slow.value}_{self.buy_macd_sign.value}"
+        dataframe["macd"] = macd["MACD" + macd_suffix]
+        dataframe["macd_h"] = macd["MACDh" + macd_suffix]  # macd value
+        dataframe["macd_s"] = macd["MACDs" + macd_suffix]  # signal value
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -121,6 +103,7 @@ class FerrariStratV1(IStrategy):
                 & (dataframe[f"supertrend_2_buy"] == 1)
                 & (dataframe[f"supertrend_3_buy"] == 1)
                 & (dataframe["volume"] > 0)
+                & (dataframe["macd_h"] > dataframe["macd_s"])
             ),
             "enter_long",
         ] = 1
@@ -128,14 +111,8 @@ class FerrariStratV1(IStrategy):
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        # dataframe.loc[
-        #     (
-        #         (dataframe[f"supertrend_1_sell"] == -1)
-        #         & (dataframe[f"supertrend_2_sell"] == -1)
-        #         & (dataframe[f"supertrend_3_sell"] == -1)
-        #         & (dataframe["volume"] > 0)
-        #     ),
-        #     "exit_long",
-        # ] = 0
-
+        dataframe.loc[
+            ((dataframe[f"supertrend_3_buy"] == -1) & (dataframe["volume"] > 0)),
+            "exit_long",
+        ] = 1
         return dataframe

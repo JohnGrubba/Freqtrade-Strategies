@@ -35,9 +35,9 @@ class FerrariStratV1(IStrategy):
 
     # Hyperoptable parameters
     # Buy Supertrend Multipliers
-    buy_m1 = IntParameter(1, 3, default=3)
-    buy_m2 = IntParameter(4, 6, default=5)
-    buy_m3 = IntParameter(7, 10, default=10)
+    buy_m1 = IntParameter(1, 10, default=3)
+    buy_m2 = IntParameter(4, 15, default=5)
+    buy_m3 = IntParameter(7, 20, default=10)
     # Buy Supertrend Periods
     buy_p1 = IntParameter(10, 20, default=14)
     buy_p2 = IntParameter(21, 50, default=25)

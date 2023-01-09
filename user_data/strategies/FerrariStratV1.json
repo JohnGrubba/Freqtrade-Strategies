@@ -1,0 +1,35 @@
+{
+  "strategy_name": "FerrariStratV1",
+  "params": {
+    "stoploss": {
+      "stoploss": -0.99
+    },
+    "trailing": {
+      "trailing_stop": false,
+      "trailing_stop_positive": 0.01,
+      "trailing_stop_positive_offset": 0.025,
+      "trailing_only_offset_is_reached": false
+    },
+    "buy": {
+      "buy_m1": 9,
+      "buy_m2": 13,
+      "buy_m3": 7,
+      "buy_macd_fast": 28,
+      "buy_macd_sign": 13,
+      "buy_macd_slow": 243,
+      "buy_p1": 14,
+      "buy_p2": 45,
+      "buy_p3": 59
+    },
+    "sell": {},
+    "protection": {},
+    "roi": {
+      "0": 0.08299999999999999,
+      "16": 0.038,
+      "28": 0.01,
+      "40": 0
+    }
+  },
+  "ft_stratparam_v": 1,
+  "export_time": "2023-01-09 21:30:23.505214+00:00"
+}

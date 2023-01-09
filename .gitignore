@@ -1,7 +1,12 @@
-user_data/backtest_results
-user_data/data
-user_data/freqaimodels
-user_data/logs
-user_data/notebooks
-user_data/plot
-user_data/hyperopt.lock
+# ignore all
+*
+# whitelist all directories
+!*/
+# whitelist
+!.gitignore
+!user_data/hyperopt_results/*
+# strategies
+!user_data/strategies/FerrariStratV1.*
+
+
+

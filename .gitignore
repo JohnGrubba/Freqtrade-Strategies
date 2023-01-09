@@ -7,6 +7,4 @@
 !user_data/hyperopt_results/*
 # strategies
 !user_data/strategies/FerrariStratV1.*
-
-
-
+!user_data/strategies/PenisV69.*

@@ -6,3 +6,5 @@
 - Make sure to Invest all of your money, to get the lowest profits possible
 - Hyperopt to short trade duration.
 - Entries always after pumps -> to snipe dumps
+- ! ATTENTION ! Those strats are NSFW
+- Make sure no one watches you starting any of those strategies live

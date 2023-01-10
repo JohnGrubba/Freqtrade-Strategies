@@ -1,4 +1,4 @@
-# Freqgay Strategies
+# Freqtrade Strategies
 
 ## Some gay and unprofitable Freqtrade Strategies by JJTV and Liam
 

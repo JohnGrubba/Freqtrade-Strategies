@@ -4,7 +4,7 @@ import pandas_ta as pta
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 
-class LiamStrat(IStrategy):
+class PenisV69(IStrategy):
     INTERFACE_VERSION: int = 3
 
     # ROI table:
@@ -20,7 +20,7 @@ class LiamStrat(IStrategy):
     trailing_stop = True
 
     # Optimal timeframe
-    timeframe = '15m'
+    timeframe = '5m'
 
     startup_candle_count: int = 16
     
@@ -34,46 +34,55 @@ class LiamStrat(IStrategy):
     
     macd_buy = DecimalParameter(0.1, 20.0, default=1.2, space="buy") # Wie hoch macd um buy
     
+    stoch_k = IntParameter(3, 40, default=14, space="buy")
+    stoch_d = IntParameter(1, 20, default=3, space="buy")
+    stoch_smooth_k = IntParameter(1, 20, default=3, space="buy")
+    
 
-    def populate_indicators(s, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        st = pta.supertrend(dataframe['high'], dataframe['low'], dataframe['close'], length=s.st_candles.value, multiplier=s.st_multipl.value)
+    def populate_indicators(s, df: DataFrame, metadata: dict) -> DataFrame:
+        st = pta.supertrend(df['high'], df['low'], df['close'], length=s.st_candles.value, multiplier=s.st_multipl.value)
         st_suffix = f"_{s.st_candles.value}_{s.st_multipl.value}"
-        dataframe['st'] = st['SUPERT' + st_suffix]
-        dataframe['st_d'] = st['SUPERTd' + st_suffix]
-        dataframe['st_s'] = st['SUPERTs' + st_suffix]
-        dataframe['st_l'] = st['SUPERTl' + st_suffix]
+        df['st'] = st['SUPERT' + st_suffix]
+        df['st_d'] = st['SUPERTd' + st_suffix]
+        df['st_s'] = st['SUPERTs' + st_suffix]
+        df['st_l'] = st['SUPERTl' + st_suffix]
 
-        macd = pta.macd(dataframe['close'], s.macd_fast.value, s.macd_slow.value, s.macd_sign.value)
+        macd = pta.macd(df['close'], s.macd_fast.value, s.macd_slow.value, s.macd_sign.value)
         macd_suffix = f"_{s.macd_fast.value}_{s.macd_slow.value}_{s.macd_sign.value}"
-        dataframe['macd'] = macd['MACD' + macd_suffix]    # macd signal difference (relevant)
-        dataframe['macd_h'] = macd['MACDh' + macd_suffix] # macd value
-        dataframe['macd_s'] = macd['MACDs' + macd_suffix] # signal value
-        return dataframe
+        df['macd'] = macd['MACD' + macd_suffix]    # macd signal difference (relevant)
+        df['macd_h'] = macd['MACDh' + macd_suffix] # macd value
+        df['macd_s'] = macd['MACDs' + macd_suffix] # signal value
+        
+        stoch = pta.stoch(df['high'], df['low'], df['close'], s.stoch_k.value, s.stoch_d.value, s.stoch_smooth_k.value)
+        stoch_suffix = f"_{s.stoch_k.value}_{s.stoch_d.value}_{s.stoch_smooth_k.value}"
+        #what output?
+        print(stoch)
+        return df
 
-    def populate_entry_trend(s, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        #dataframe.loc[(True), 'enter_long'] = 0
-        #dataframe.loc[
+    def populate_entry_trend(s, df: DataFrame, metadata: dict) -> DataFrame:
+        #df.loc[(True), 'enter_long'] = 0
+        #df.loc[
         #    (
-        #        (qtpylib.crossed_above(dataframe['ema5'], dataframe['ema15']))
+        #        (qtpylib.crossed_above(df['ema5'], df['ema15']))
         #    ),
         #    'enter_long'] = 1
-        dataframe.loc[(
-                (dataframe['st_d'] == 1) &
-                (dataframe['st_d'].shift() == -1) &
-                (dataframe['macd'] >= s.macd_buy.value)
+        df.loc[(
+                (df['st_d'] == 1) &
+                (df['st_d'].shift() == -1) &
+                (df['macd'] >= s.macd_buy.value)
             ), ['enter_long', 'enter_tag']] = (1, 'st_macd')
-        return dataframe
+        return df
 
-    def populate_exit_trend(s, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        #dataframe.loc[
+    def populate_exit_trend(s, df: DataFrame, metadata: dict) -> DataFrame:
+        #df.loc[
         #    (
-        #        (qtpylib.crossed_below(dataframe['ema5'], dataframe['ema15'])) |
-        #        (dataframe['ema5'].values[-1] < dataframe['ema5'].values[-2])
+        #        (qtpylib.crossed_below(df['ema5'], df['ema15'])) |
+        #        (df['ema5'].values[-1] < df['ema5'].values[-2])
         #    ),
         #    'exit_long'] = 1
-        dataframe.loc[(
-                (dataframe['st_d'] == -1) | #&
-                (dataframe['macd'] < 0)
-                #(dataframe['supertrend_direction'].shift() == 1)
+        df.loc[(
+                (df['st_d'] == -1) | #&
+                (df['macd'] < 0)
+                #(df['supertrend_direction'].shift() == 1)
             ), ['exit_long', 'exit_tag']] = (1, 'st_macd_change')
-        return dataframe
+        return df

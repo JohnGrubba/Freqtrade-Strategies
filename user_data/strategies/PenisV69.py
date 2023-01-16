@@ -22,7 +22,7 @@ class PenisV69(IStrategy):
     # Optimal timeframe
     timeframe = '5m'
 
-    startup_candle_count: int = 16
+    startup_candle_count: int = 50
     
     
     st_candles = IntParameter(3, 50, default=10, space="buy") # Wie viele Candles
@@ -38,6 +38,19 @@ class PenisV69(IStrategy):
     stoch_d = IntParameter(1, 20, default=3, space="buy")
     stoch_smooth_k = IntParameter(1, 20, default=3, space="buy")
     
+    short_has = IntParameter(2, 5, default=3, space="buy")
+    strng_has = IntParameter(5, 15, default=10, space="buy")
+    
+    def pivotid(s, df1: DataFrame, l, n1, n2): #n1 n2 before and after candle l
+        if l-n1 < 0 or l+n2 >= len(df1): return 0
+        pividlow,pividhigh=1,1
+        for i in range(l-n1, l+n2+1):
+            if(df1.low[l]>df1.low[i]): pividlow=0
+            if(df1.high[l]<df1.high[i]): pividhigh=0
+        if pividlow and pividhigh: return 3
+        elif pividlow: return 1
+        elif pividhigh: return 2
+        else: return 0
 
     def populate_indicators(s, df: DataFrame, metadata: dict) -> DataFrame:
         st = pta.supertrend(df['high'], df['low'], df['close'], length=s.st_candles.value, multiplier=s.st_multipl.value)
@@ -53,10 +66,15 @@ class PenisV69(IStrategy):
         df['macd_h'] = macd['MACDh' + macd_suffix] # macd value
         df['macd_s'] = macd['MACDs' + macd_suffix] # signal value
         
-        stoch = pta.stoch(df['high'], df['low'], df['close'], s.stoch_k.value, s.stoch_d.value, s.stoch_smooth_k.value)
-        stoch_suffix = f"_{s.stoch_k.value}_{s.stoch_d.value}_{s.stoch_smooth_k.value}"
+        #stoch = pta.stoch(df['high'], df['low'], df['close'], s.stoch_k.value, s.stoch_d.value, s.stoch_smooth_k.value)
+        #stoch_suffix = f"_{s.stoch_k.value}_{s.stoch_d.value}_{s.stoch_smooth_k.value}"
         #what output?
-        print(stoch)
+        #print(stoch)
+        #print("start")
+        #df['short_has'] = df.apply(lambda x: s.pivotid(df, x.name,s.short_has.value,s.short_has.value), axis=1)
+        #df['strng_has'] = df.apply(lambda x: s.pivotid(df, x.name,s.strng_has.value,s.strng_has.value), axis=1)
+
+        #print("start")
         return df
 
     def populate_entry_trend(s, df: DataFrame, metadata: dict) -> DataFrame:

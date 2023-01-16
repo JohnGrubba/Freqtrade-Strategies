@@ -5,6 +5,8 @@
 # whitelist
 !.gitignore
 !user_data/hyperopt_results/*
+# data
+!user_data/data/*/*.json
 # strategies
 !user_data/strategies/FerrariStratV1.*
 !user_data/strategies/PenisV69.*

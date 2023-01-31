@@ -4,7 +4,7 @@
 
 - Try those Live and your Life will be destroyed.
 - Make sure to Invest all of your money, to get the lowest profits possible.
-- They base on no technical analysis and no good indicators.
+- They are not based on technical analysis or good indicators.
 - It's better to just trade randomly, than to use the strategies.
 - Hyperopt to short trade duration.
 - Entries always after pumps -> to snipe dumps.

@@ -19,4 +19,4 @@ jobs:
           cd freqtrade
           git checkout stable
           ./setup.sh -i
-          source ./.env/bin/activate
+          source .env/bin/activate; freqtrade download-data --days 30 --timeframe 1m;freqtrade backtesting --strategy PenisV69

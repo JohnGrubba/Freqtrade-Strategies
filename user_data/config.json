@@ -81,15 +81,15 @@
     },
     "api_server": {
         "enabled": false,
-        "listen_ip_address": "127.0.0.1",
+        "listen_ip_address": "0.0.0.0",
         "listen_port": 8080,
         "verbosity": "error",
         "enable_openapi": false,
-        "jwt_secret_key": "321af7d9f7594b05cf986ae271a4b441831c8e75e1b79e65e89adc75699195df",
-        "ws_token": "OjNHGRme4RA-SFmejEXAWXuBsM_7WzPQQQ",
+        "jwt_secret_key": "",
+        "ws_token": "OjNHGRme4RA-",
         "CORS_origins": [],
-        "username": "",
-        "password": ""
+        "username": "a",
+        "password": "a"
     },
     "bot_name": "freqtrade",
     "initial_state": "running",

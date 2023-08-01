@@ -10,3 +10,9 @@
 - Entries always after pumps -> to snipe dumps.
 - ! ATTENTION ! Those strats are NSFW.
 - Make sure no one watches you starting any of those strategies live.
+
+
+## Live Results
+
+- From 2023-01 -> 2023-08 = -200% (Currently selling my house)
+- Lost my Family (couldn't afford food)
